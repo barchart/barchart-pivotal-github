@@ -21,7 +21,18 @@ public class HelloWorld extends HttpServlet {
 
 	public static void main(final String[] args) throws Exception {
 
-		final Server server = new Server(8888);
+		final String PORT = System.getenv("PORT");
+
+		final int port;
+		if (PORT == null) {
+			/** development */
+			port = 8888;
+		} else {
+			/** heroku dynamic port */
+			port = Integer.valueOf(PORT);
+		}
+
+		final Server server = new Server(port);
 
 		final ServletContextHandler context = new ServletContextHandler(
 				ServletContextHandler.SESSIONS);
