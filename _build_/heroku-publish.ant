@@ -1,0 +1,44 @@
+<!--
+
+    Copyright (C) 2011-2012 Barchart, Inc. <http://www.barchart.com/>
+
+    All rights reserved. Licensed under the OSI BSD License.
+
+    http://www.opensource.org/licenses/bsd-license.php
+
+-->
+<project default="heroku" basedir="./..">
+
+	<echo message="basedir : ${basedir}" />
+
+	<target name="heroku">
+
+		<!-- Ensure heroku remote -->
+		<exec executable="git">
+			<arg value="remote" />
+			<arg value="add" />
+			<arg value="heroku" />
+			<arg value="git@heroku.com:barchart-pivotal-github.git" />
+		</exec>
+
+		<!-- Publish current master -->
+		<exec executable="git">
+			<arg value="push" />
+			<arg value="heroku" />
+			<arg value="master" />
+		</exec>
+
+		<!-- Ensure application scaling -->
+		<exec executable="heroku">
+			<arg value="ps:scale" />
+			<arg value="web=1" />
+		</exec>
+
+		<!-- Verfiy application status -->
+		<exec executable="heroku">
+			<arg value="apps:info" />
+		</exec>
+
+	</target>
+
+</project>
