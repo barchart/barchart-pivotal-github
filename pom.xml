@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>heroku-hello</groupId>
-	<artifactId>heroku-hello</artifactId>
-
+	
+	<groupId>com.barchart.web</groupId>
+	<artifactId>barchart-pivotal-github</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 
 	<dependencies>
@@ -12,7 +12,7 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlet</artifactId>
-			<version>7.6.0.v20120127</version>
+			<version>7.6.12.v20130726</version>
 		</dependency>
 
 		<dependency>
