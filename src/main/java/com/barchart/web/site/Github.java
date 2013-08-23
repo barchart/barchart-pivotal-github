@@ -20,13 +20,23 @@ public class Github extends HttpServlet {
 	private static final Logger log = LoggerFactory.getLogger(Github.class);
 
 	@Override
-	protected void doGet(final HttpServletRequest requset,
+	protected void doGet(final HttpServletRequest request,
 			final HttpServletResponse response) throws ServletException,
 			IOException {
 
 		final PrintWriter writer = response.getWriter();
 
 		writer.println("Github");
+
+		/**
+		 * https://github.com/github/github-services/blob/master/lib/services/
+		 * web.rb
+		 */
+		final String githubEvent = request.getHeader("X-GitHub-Event");
+		final String githubDelivery = request.getHeader("X-GitHub-Delivery");
+
+		log.info("githubEvent : {}", githubEvent);
+		log.info("githubDelivery : {}", githubDelivery);
 
 	}
 
