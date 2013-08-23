@@ -1,0 +1,10 @@
+Host *
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
+
+#
+# https://dashboard.heroku.com/account
+#
+Host heroku.com
+  User git
+  IdentityFile ~/.ssh/id_rsa_heroku
