@@ -1,0 +1,28 @@
+<!--
+
+    Copyright (C) 2011-2012 Barchart, Inc. <http://www.barchart.com/>
+
+    All rights reserved. Licensed under the OSI BSD License.
+
+    http://www.opensource.org/licenses/bsd-license.php
+
+-->
+<project default="heroku" basedir="./..">
+
+	<echo message="basedir : ${basedir}" />
+
+	<target name="heroku">
+
+		<!-- Verfiy application info -->
+		<exec executable="heroku">
+			<arg value="apps:info" />
+		</exec>
+
+		<!-- Verfiy application logs -->
+		<exec executable="heroku">
+			<arg value="logs" />
+		</exec>
+
+	</target>
+
+</project>
