@@ -14,10 +14,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Home page.
  */
-public class Home extends HttpServlet {
+public class Github extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger log = LoggerFactory.getLogger(Home.class);
+	private static final Logger log = LoggerFactory.getLogger(Github.class);
 
 	@Override
 	protected void doGet(final HttpServletRequest requset,
@@ -26,7 +26,7 @@ public class Home extends HttpServlet {
 
 		final PrintWriter writer = response.getWriter();
 
-		writer.println("Home");
+		writer.println("Github");
 
 	}
 
@@ -37,7 +37,7 @@ public class Home extends HttpServlet {
 
 		final PrintWriter writer = response.getWriter();
 
-		writer.println("Home");
+		writer.println("Github");
 
 	}
 

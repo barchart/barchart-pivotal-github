@@ -4,7 +4,9 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import com.barchart.web.site.Github;
 import com.barchart.web.site.Home;
+import com.barchart.web.site.Pivotal;
 
 /**
  * Jetty launcher.
@@ -35,7 +37,9 @@ public class Main {
 
 		server.setHandler(context);
 
-		context.addServlet(new ServletHolder(new Home()), "/*");
+		context.addServlet(new ServletHolder(new Home()), "/");
+		context.addServlet(new ServletHolder(new Github()), "/github");
+		context.addServlet(new ServletHolder(new Pivotal()), "/pivotal");
 
 		server.start();
 

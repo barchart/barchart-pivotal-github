@@ -22,3 +22,8 @@ pom.xml.*
 # Do not store any logs
 #
 *.log
+
+#
+# local properties
+#
+.properties
