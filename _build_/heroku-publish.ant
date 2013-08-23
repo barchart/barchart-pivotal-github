@@ -34,9 +34,14 @@
 			<arg value="web=1" />
 		</exec>
 
-		<!-- Verfiy application status -->
+		<!-- Verfiy application info -->
 		<exec executable="heroku">
 			<arg value="apps:info" />
+		</exec>
+
+		<!-- Verfiy application logs -->
+		<exec executable="heroku">
+			<arg value="logs" />
 		</exec>
 
 	</target>
