@@ -62,7 +62,7 @@ public class Home extends HttpServlet {
 		// Confirm the subscription
 		if (message.get("Type").equals("SubscriptionConfirmation")) {
 
-			final AmazonSNSClient client = Util.amazonSNS();
+			final AmazonSNSClient client = Util.clientAmazonSNS();
 
 			final String topicARN = message.get("TopicArn");
 			final String tokenSNS = message.get("Token");

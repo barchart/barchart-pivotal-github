@@ -1,5 +1,8 @@
 package com.barchart.web.site;
 
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.RepositoryService;
+
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.sns.AmazonSNSClient;
@@ -12,7 +15,7 @@ public class Util {
 		return ConfigFactory.defaultReference();
 	}
 
-	public static AmazonSNSClient amazonSNS() {
+	public static AmazonSNSClient clientAmazonSNS() {
 
 		final Config config = reference();
 
@@ -25,6 +28,24 @@ public class Util {
 
 		return client;
 
+	}
+
+	public static GitHubClient clientGithubAPI() {
+
+		final Config config = reference();
+
+		final String username = config.getString("github.username");
+		final String password = config.getString("github.password");
+
+		final GitHubClient client = new GitHubClient();
+		client.setCredentials(username, password);
+
+		return client;
+
+	}
+
+	public static RepositoryService githubRepositoryService() {
+		return new RepositoryService(clientGithubAPI());
 	}
 
 }

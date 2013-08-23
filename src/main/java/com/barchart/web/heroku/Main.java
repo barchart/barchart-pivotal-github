@@ -6,7 +6,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.barchart.web.site.Github;
 import com.barchart.web.site.Home;
+import com.barchart.web.site.Init;
 import com.barchart.web.site.Pivotal;
+import com.barchart.web.site.Util;
+import com.typesafe.config.Config;
 
 /**
  * Jetty launcher.
@@ -14,6 +17,8 @@ import com.barchart.web.site.Pivotal;
 public class Main {
 
 	public static void main(final String[] args) throws Exception {
+
+		Init.initGithubWebhooks();
 
 		/** Heroku provided. */
 		final String PORT = System.getenv("PORT");
@@ -37,9 +42,17 @@ public class Main {
 
 		server.setHandler(context);
 
-		context.addServlet(new ServletHolder(new Home()), "/");
-		context.addServlet(new ServletHolder(new Github()), "/github");
-		context.addServlet(new ServletHolder(new Pivotal()), "/pivotal");
+		final Config reference = Util.reference();
+
+		final Config pathConfig = reference
+				.getConfig("heroku.application.path");
+
+		context.addServlet(new ServletHolder(new Home()),
+				pathConfig.getString("home"));
+		context.addServlet(new ServletHolder(new Github()),
+				pathConfig.getString("github"));
+		context.addServlet(new ServletHolder(new Pivotal()),
+				pathConfig.getString("pivotal"));
 
 		server.start();
 
