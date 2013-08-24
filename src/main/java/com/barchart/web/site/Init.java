@@ -66,16 +66,15 @@ public class Init {
 	/**
 	 * Create default github webhook bean.
 	 */
+	// https://github.com/github/github-services/blob/master/lib/services/kato.rb
 	public static RepositoryHook githubWebhook(final String url) {
 
 		final Map<String, String> config = new HashMap<String, String>();
-		config.put("url", url);
-		config.put("content_type", "json");
-		config.put("ssl_version", "3");
+		config.put("webhook_url", url);
 
 		final RepositoryHook hook = new RepositoryHook();
 		hook.setActive(true);
-		hook.setName("web");
+		hook.setName("lechat");
 		hook.setConfig(config);
 
 		return hook;

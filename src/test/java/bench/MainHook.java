@@ -36,8 +36,6 @@ public class MainHook {
 		final Map<String, String> config = new HashMap<String, String>();
 		config.put("webhook_url",
 				"https://barchart-pivotal-github.herokuapp.com/github");
-		config.put("content_type", "json");
-		config.put("ssl_version", "3");
 
 		final RepositoryHook request = new RepositoryHook();
 		request.setActive(true);
@@ -49,9 +47,9 @@ public class MainHook {
 		final List<RepositoryHook> hookList = service.getHooks(repository);
 
 		for (final RepositoryHook hook : hookList) {
-			System.out.println("hook: " + hook.getId());
-			System.out.println("hook: " + hook.getName());
-			System.out.println("hook: " + hook.getUrl());
+			System.out.println("hook.name: " + hook.getName());
+			System.out.println("hook.url : " + hook.getUrl());
+			System.out.println("hook.conf: " + hook.getConfig());
 		}
 
 	}
