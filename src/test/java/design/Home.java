@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.ConfirmSubscriptionRequest;
 import com.amazonaws.services.sns.model.ConfirmSubscriptionResult;
-import com.barchart.web.site.Util;
+import com.barchart.web.util.UtilAWS;
 
 /**
  * Home page.
@@ -62,7 +62,7 @@ public class Home extends HttpServlet {
 		// Confirm the subscription
 		if (message.get("Type").equals("SubscriptionConfirmation")) {
 
-			final AmazonSNSClient client = Util.clientAmazonSNS();
+			final AmazonSNSClient client = UtilAWS.clientAmazonSNS();
 
 			final String topicARN = message.get("TopicArn");
 			final String tokenSNS = message.get("Token");

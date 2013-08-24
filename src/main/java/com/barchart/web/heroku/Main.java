@@ -6,9 +6,9 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.barchart.web.site.Github;
 import com.barchart.web.site.Home;
-import com.barchart.web.site.Init;
 import com.barchart.web.site.Pivotal;
-import com.barchart.web.site.Util;
+import com.barchart.web.util.UtilGH;
+import com.barchart.web.util.Util;
 import com.typesafe.config.Config;
 
 /**
@@ -18,7 +18,7 @@ public class Main {
 
 	public static void main(final String[] args) throws Exception {
 
-		Init.ensureGithubWebhookAll();
+		UtilGH.ensureGithubWebhookAll();
 
 		/** Heroku provided. */
 		final String PORT = System.getenv("PORT");

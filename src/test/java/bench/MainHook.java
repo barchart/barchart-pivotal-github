@@ -7,9 +7,9 @@ import java.util.Properties;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryHook;
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.RepositoryService;
 
-import com.barchart.web.site.Init;
+import com.barchart.web.util.UtilGH;
+import com.barchart.web.util.RepositoryServiceExtra;
 
 public class MainHook {
 
@@ -25,14 +25,15 @@ public class MainHook {
 		final GitHubClient client = new GitHubClient();
 		client.setCredentials(username, password);
 
-		final RepositoryService service = new RepositoryService(client);
+		final RepositoryServiceExtra service = new RepositoryServiceExtra(
+				client);
 
 		final IRepositoryIdProvider repository = service.getRepository(
 				"barchart", "barchart-http");
 
 		final String url = "https://barchart-pivotal-github.herokuapp.com/github";
 
-		Init.ensureGithubWebhook(service, repository, url, secret);
+		UtilGH.ensureGithubWebhook(service, repository, url, secret);
 
 		final List<RepositoryHook> hookList = service.getHooks(repository);
 

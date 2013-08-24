@@ -1,4 +1,4 @@
-package com.barchart.web.site;
+package com.barchart.web.util;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -7,45 +7,61 @@ import java.util.Map;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryHook;
-import org.eclipse.egit.github.core.service.RepositoryService;
+import org.eclipse.egit.github.core.client.GitHubClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
 
 /**
- * Configuration initializers.
+ * Github utilities.
  */
-public class Init {
+public class UtilGH {
 
-	static String HOOK_1 = "web";
-
-	static String HOOK_2 = "lechat";
+	static String HOOK_NAME = "web";
 
 	// https://github.com/github/github-services/blob/master/lib/service.rb#L79
-	static final String KNOWN_EVENTS = "create," + "delete," + //
-			"commit_comment," + //
-			"download," + //
-			"follow," + //
-			"fork," + //
-			"fork_apply," + //
-			"gist," + //
-			"gollum," + //
-			"issue_comment," + //
-			"issues," + //
-			"member," + //
-			"public," + //
-			"pull_request," + //
-			"push," + //
-			"team_add," + //
-			"watch," + //
-			"pull_request_review_comment," + //
-			"status";
+	static final String[] KNOWN_EVENTS = new String[] { //
+	//
+			"create", //
+			"delete", //
+			"commit_comment", //
+			"download", //
+			"follow", //
+			"fork", //
+			"fork_apply", //
+			"gist", //
+			"gollum", //
+			"issues", //
+			"issue_comment", //
+			"member", //
+			"public", //
+			"pull_request", //
+			"push", "team_add", //
+			"watch", //
+			"pull_request_review_comment", //
+			"status", //
 
-	private static final Logger log = LoggerFactory.getLogger(Init.class);
+	};
+
+	private static final Logger log = LoggerFactory.getLogger(UtilGH.class);
+
+	public static GitHubClient clientGithubAPI() {
+
+		final Config config = Util.reference();
+
+		final String username = config.getString("github.username");
+		final String password = config.getString("github.password");
+
+		final GitHubClient client = new GitHubClient();
+		client.setCredentials(username, password);
+
+		return client;
+
+	}
 
 	/**
-	 * Verify github webhook hook presence in the list by name and config match.
+	 * Verify github webhook presence in the list by name and config match.
 	 */
 	public static boolean contains(final List<RepositoryHook> hookList,
 			final RepositoryHook item) {
@@ -60,7 +76,11 @@ public class Init {
 
 	}
 
-	public static void ensureGithubWebhook(final RepositoryService service,
+	/**
+	 * Create new or replace old hook.
+	 */
+	public static void ensureGithubWebhook(
+			final RepositoryServiceExtra service,
 			final IRepositoryIdProvider repository, final String url,
 			final String secret) throws IOException {
 
@@ -68,15 +88,13 @@ public class Init {
 
 		for (final RepositoryHook hook : hookList) {
 			final String name = hook.getName();
-			final boolean isMatch = HOOK_1.equals(name) || HOOK_2.equals(name);
-			if (isMatch) {
+			if (HOOK_NAME.equals(name)) {
 				log.info("hook delete: {}", name);
 				service.deleteHook(repository, (int) hook.getId());
 			}
 		}
 
-		final RepositoryHook hook = githubWebhook1(url, secret);
-		// final RepositoryHook hook = githubWebhook2(url);
+		final RepositoryHook hook = githubWebhook(url, secret);
 
 		service.createHook(repository, hook);
 		log.info("hook create: {}", hook.getName());
@@ -88,7 +106,7 @@ public class Init {
 	 */
 	public static final void ensureGithubWebhookAll() throws IOException {
 
-		final RepositoryService service = Util.githubRepositoryService();
+		final RepositoryServiceExtra service = UtilGH.githubRepositoryService();
 
 		final Config reference = Util.reference();
 
@@ -137,44 +155,30 @@ public class Init {
 
 	}
 
-	/**
-	 * Create default github webhook bean.
-	 */
-	public static RepositoryHook githubWebhook1(final String url,
-			final String secret) {
-
-		// https://github.com/github/github-services/blob/master/lib/services/web.rb
-
-		final Map<String, String> config = new HashMap<String, String>();
-		config.put("url", url); // post target
-		config.put("secret", secret); // enable sha1
-		config.put("content_type", "json"); // ensure encoding
-		config.put("ssl_version", "3"); // use secure ssl
-		config.put("insecure_ssl", "1"); // ignore ssl certificate check
-
-		final RepositoryHook hook = new RepositoryHook();
-		hook.setActive(true);
-		hook.setName(HOOK_1);
-		hook.setConfig(config);
-
-		return hook;
-
+	public static RepositoryServiceExtra githubRepositoryService() {
+		return new RepositoryServiceExtra(clientGithubAPI());
 	}
 
 	/**
 	 * Create default github webhook bean.
 	 */
-	public static RepositoryHook githubWebhook2(final String url) {
+	public static RepositoryHookExtra githubWebhook(final String url,
+			final String secret) {
 
-		// https://github.com/github/github-services/blob/master/lib/services/kato.rb
+		// https://github.com/github/github-services/blob/master/lib/services/web.rb
 
 		final Map<String, String> config = new HashMap<String, String>();
-		config.put("webhook_url", url); // post target
+		config.put("url", url); // target for http post
+		config.put("secret", secret); // enable hmac verification
+		config.put("content_type", "json"); // ensure body encoding
+		config.put("ssl_version", "3"); // use latest ssl protocol
+		config.put("insecure_ssl", "1"); // ignore ssl certificate check
 
-		final RepositoryHook hook = new RepositoryHook();
+		final RepositoryHookExtra hook = new RepositoryHookExtra();
 		hook.setActive(true);
-		hook.setName(HOOK_2);
+		hook.setName(HOOK_NAME);
 		hook.setConfig(config);
+		hook.setEvents(KNOWN_EVENTS);
 
 		return hook;
 

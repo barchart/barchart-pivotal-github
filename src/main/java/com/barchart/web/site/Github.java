@@ -2,6 +2,8 @@ package com.barchart.web.site;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -11,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.barchart.web.util.Util;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -42,13 +45,54 @@ public class Github extends HttpServlet {
 
 		writer.println("Github");
 
-		final String payload = Util.consume(request);
+		final String githubEvent = request.getHeader("X-GitHub-Event");
+		log.info("githubEvent : {}", githubEvent);
 
-		log.info("payload : {}", payload);
+		final String paytext = Util.consume(request);
 
-		final Config config = ConfigFactory.parseString(payload);
+		final Config payload = ConfigFactory.parseString(paytext);
 
-		// config.getInt("number");
+		switch (githubEvent) {
+		case "issues":
+			processIssues(payload);
+			break;
+		default:
+			break;
+		}
+
+	}
+
+	// "url": "https://api.github.com/repos/octocat/Hello-World/issues/1347"
+	static final Pattern RX_URL = Pattern
+			.compile(".*/repos/(\\W+)/(\\W+)/issues/.*");
+
+	// http://developer.github.com/v3/activity/events/types/#issuesevent
+	// http://developer.github.com/v3/issues/#get-a-single-issue
+	protected void processIssues(final Config payload) {
+
+		final String action = payload.getString("action");
+
+		final Config issue = payload.getConfig("issue");
+
+		final String url = issue.getString("url");
+		final String title = issue.getString("title");
+		final String number = issue.getString("number");
+
+		final Matcher matcher = RX_URL.matcher(url);
+		final String user = matcher.group(1);
+		final String project = matcher.group(2);
+
+		switch (action) {
+		case "opened":
+		case "reopened":
+			log.info("opened: {} {}", project, number);
+			break;
+		case "closed":
+			log.info("closed: {} {}", project, number);
+			break;
+		default:
+			return;
+		}
 
 	}
 
