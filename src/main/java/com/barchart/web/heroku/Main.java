@@ -18,7 +18,7 @@ public class Main {
 
 	public static void main(final String[] args) throws Exception {
 
-		UtilGH.ensureGithubWebhookAll();
+		UtilGH.ensureWebhookAll();
 
 		/** Heroku provided. */
 		final String PORT = System.getenv("PORT");

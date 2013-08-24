@@ -14,39 +14,47 @@ import org.slf4j.LoggerFactory;
 import com.typesafe.config.Config;
 
 /**
- * Github utilities.
+ * Github rest-api utilities.
  */
 public class UtilGH {
 
 	static String HOOK_NAME = "web";
 
+	// http://developer.github.com/v3/activity/events/types/
 	// https://github.com/github/github-services/blob/master/lib/service.rb#L79
 	static final String[] KNOWN_EVENTS = new String[] { //
 	//
+			"push", //
+			"commit_comment", //
+			//
+			"pull_request", //
+			"pull_request_review_comment", //
+			//
+			"issues", //
+			"issue_comment", //
+			//
 			"create", //
 			"delete", //
-			"commit_comment", //
 			"download", //
-			"follow", //
+			"member", //
+			"team_add", //
 			"fork", //
 			"fork_apply", //
 			"gist", //
 			"gollum", //
-			"issues", //
-			"issue_comment", //
-			"member", //
 			"public", //
-			"pull_request", //
-			"push", "team_add", //
+			"follow", //
 			"watch", //
-			"pull_request_review_comment", //
 			"status", //
 
 	};
 
 	private static final Logger log = LoggerFactory.getLogger(UtilGH.class);
 
-	public static GitHubClient clientGithubAPI() {
+	/**
+	 * New github rest-api client
+	 */
+	public static GitHubClient clientRest() {
 
 		final Config config = Util.reference();
 
@@ -79,8 +87,7 @@ public class UtilGH {
 	/**
 	 * Create new or replace old hook.
 	 */
-	public static void ensureGithubWebhook(
-			final RepositoryServiceExtra service,
+	public static void ensureWebhook(final RepositoryServiceExtra service,
 			final IRepositoryIdProvider repository, final String url,
 			final String secret) throws IOException {
 
@@ -94,7 +101,7 @@ public class UtilGH {
 			}
 		}
 
-		final RepositoryHook hook = githubWebhook(url, secret);
+		final RepositoryHook hook = webhook(url, secret);
 
 		service.createHook(repository, hook);
 		log.info("hook create: {}", hook.getName());
@@ -102,25 +109,20 @@ public class UtilGH {
 	}
 
 	/**
-	 * Create github web service hooks if missing.
+	 * Create github web service hooks for all projects.
 	 */
-	public static final void ensureGithubWebhookAll() throws IOException {
-
-		final RepositoryServiceExtra service = UtilGH.githubRepositoryService();
+	public static void ensureWebhookAll() throws IOException {
 
 		final Config reference = Util.reference();
 
 		final String owner = reference.getString("github.owner");
 		final String secret = reference.getString("github.secret");
-
-		final String pathRoot = reference.getString("heroku.application.url");
-		final String pathGithub = reference
-				.getString("heroku.application.path.github");
+		final String webhook = reference.getString("github.webhook");
 
 		final List<? extends Config> projectList = reference
 				.getConfigList("project-list");
 
-		final String pathWebhook = pathRoot + pathGithub;
+		final RepositoryServiceExtra service = repositoryService();
 
 		for (final Config project : projectList) {
 
@@ -131,7 +133,7 @@ public class UtilGH {
 			final IRepositoryIdProvider repository = service.getRepository(
 					owner, name);
 
-			ensureGithubWebhook(service, repository, pathWebhook, secret);
+			ensureWebhook(service, repository, webhook, secret);
 
 		}
 
@@ -155,14 +157,14 @@ public class UtilGH {
 
 	}
 
-	public static RepositoryServiceExtra githubRepositoryService() {
-		return new RepositoryServiceExtra(clientGithubAPI());
+	public static RepositoryServiceExtra repositoryService() {
+		return new RepositoryServiceExtra(clientRest());
 	}
 
 	/**
 	 * Create default github webhook bean.
 	 */
-	public static RepositoryHookExtra githubWebhook(final String url,
+	public static RepositoryHookExtra webhook(final String url,
 			final String secret) {
 
 		// https://github.com/github/github-services/blob/master/lib/services/web.rb
@@ -172,7 +174,7 @@ public class UtilGH {
 		config.put("secret", secret); // enable hmac verification
 		config.put("content_type", "json"); // ensure body encoding
 		config.put("ssl_version", "3"); // use latest ssl protocol
-		config.put("insecure_ssl", "1"); // ignore ssl certificate check
+		config.put("insecure_ssl", "1"); // ignore ssl certificate mismatch
 
 		final RepositoryHookExtra hook = new RepositoryHookExtra();
 		hook.setActive(true);

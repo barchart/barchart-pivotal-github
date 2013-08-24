@@ -3,9 +3,17 @@ package bench;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.barchart.pivotal.client.PivotalClient;
+import com.barchart.pivotal.model.Epic;
+import com.barchart.pivotal.model.Label;
+import com.barchart.pivotal.model.Project;
+import com.barchart.pivotal.model.Story;
+import com.barchart.pivotal.service.PivotalService;
+import com.barchart.web.util.UtilPT;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -17,17 +25,101 @@ public class MainPT {
 
 	private static final Logger log = LoggerFactory.getLogger(MainPT.class);
 
-	// public static WebForm formWithAction(final WebForm[] formList,
-	// final String action) {
-	// for (final WebForm form : formList) {
-	// if (action.equalsIgnoreCase(form.getAction())) {
-	// return form;
-	// }
-	// }
-	// return null;
-	// }
-
 	public static void main(final String[] args) throws Exception {
+
+		final PivotalClient client = UtilPT.clientRest();
+
+		final PivotalService service = new PivotalService(client);
+
+		final Label label = new Label();
+		label.name = "test : " + new DateTime().getMillis();
+		label.project_id = 896678;
+
+		log.info("labelCreate : {}", label);
+
+		log.info("labelCreate : {}", service.labelCreate(label));
+
+	}
+
+	public static void mainEpicCreate(final String[] args) throws Exception {
+
+		final PivotalClient client = UtilPT.clientRest();
+
+		final PivotalService service = new PivotalService(client);
+
+		final Epic epic = new Epic();
+		epic.project_id = 896678;
+		epic.name = "test : " + new DateTime();
+
+		log.info("epicCreate : {}", epic);
+
+		log.info("epicCreate : {}", service.epicCreate(epic));
+
+	}
+
+	public static void mainEpicList(final String[] args) throws Exception {
+
+		final PivotalClient client = UtilPT.clientRest();
+
+		final PivotalService service = new PivotalService(client);
+
+		log.info("epicList : {}", service.epicList(896678));
+
+	}
+
+	public static void mainProjectCreate(final String[] args) throws Exception {
+
+		final PivotalClient client = UtilPT.clientRest();
+
+		final PivotalService service = new PivotalService(client);
+
+		final Project project = new Project();
+		project.name = "test : " + new DateTime();
+
+		log.info("projectCreate : {}", project);
+
+		log.info("projectCreate : {}", service.projectCreate(project));
+
+	}
+
+	public static void mainProjectList(final String[] args) throws Exception {
+
+		final PivotalClient client = UtilPT.clientRest();
+
+		final PivotalService service = new PivotalService(client);
+
+		log.info("projectList : {}", service.projectList());
+
+	}
+
+	public static void mainStoryCreate(final String[] args) throws Exception {
+
+		final PivotalClient client = UtilPT.clientRest();
+
+		final PivotalService service = new PivotalService(client);
+
+		final Story story = new Story();
+		story.project_id = 896678;
+		story.name = "test : " + new DateTime();
+		story.story_type = "feature";
+
+		log.info("storyCreate : {}", story);
+
+		log.info("storyCreate : {}", service.storyCreate(story));
+
+	}
+
+	public static void mainStoryList(final String[] args) throws Exception {
+
+		final PivotalClient client = UtilPT.clientRest();
+
+		final PivotalService service = new PivotalService(client);
+
+		log.info("storyList : {}", service.storyList(896678));
+
+	}
+
+	public static void mainWebhook(final String[] args) throws Exception {
 
 		final Properties props = new Properties();
 		props.load(new FileInputStream(".properties"));
