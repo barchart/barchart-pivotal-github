@@ -63,18 +63,44 @@ public class Init {
 
 	}
 
+	// https://github.com/github/github-services/blob/master/lib/service.rb#L79
+	static final String KNOWN_EVENTS = "create," + "delete," + //
+			"commit_comment," + //
+			"download," + //
+			"follow," + //
+			"fork," + //
+			"fork_apply," + //
+			"gist," + //
+			"gollum," + //
+			"issue_comment," + //
+			"issues," + //
+			"member," + //
+			"public," + //
+			"pull_request," + //
+			"push," + //
+			"team_add," + //
+			"watch," + //
+			"pull_request_review_comment," + //
+			"status";
+
 	/**
 	 * Create default github webhook bean.
 	 */
-	// https://github.com/github/github-services/blob/master/lib/services/kato.rb
 	public static RepositoryHook githubWebhook(final String url) {
 
+		// https://github.com/github/github-services/blob/master/lib/services/web.rb
+
 		final Map<String, String> config = new HashMap<String, String>();
-		config.put("webhook_url", url);
+		config.put("url", url); // post target
+		config.put("secret", "true"); // enable sha1
+		config.put("content_type", "json"); // ensure encoding
+		config.put("ssl_version", "3"); // use secure ssl
+		config.put("insecure_ssl", "1"); // ignore ssl certificate check
+		config.put("events", KNOWN_EVENTS); // enabled github events
 
 		final RepositoryHook hook = new RepositoryHook();
 		hook.setActive(true);
-		hook.setName("lechat");
+		hook.setName("web");
 		hook.setConfig(config);
 
 		return hook;

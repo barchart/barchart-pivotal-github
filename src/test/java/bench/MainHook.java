@@ -1,15 +1,15 @@
 package bench;
 
 import java.io.FileInputStream;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryHook;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
+
+import com.barchart.web.site.Init;
 
 public class MainHook {
 
@@ -27,20 +27,12 @@ public class MainHook {
 		final RepositoryService service = new RepositoryService(client);
 
 		final IRepositoryIdProvider repository = service.getRepository(
-				"barchart", "barchart-pivotal-github");
+				"barchart", "barchart-http");
 
 		System.out.println("repository: " + service.getBranches(repository));
 
-		// https://github.com/github/github-services/blob/master/lib/services/kato.rb
-
-		final Map<String, String> config = new HashMap<String, String>();
-		config.put("webhook_url",
-				"https://barchart-pivotal-github.herokuapp.com/github");
-
-		final RepositoryHook request = new RepositoryHook();
-		request.setActive(true);
-		request.setName("lechat");
-		request.setConfig(config);
+		final String url = "https://barchart-pivotal-github.herokuapp.com/github";
+		final RepositoryHook request = Init.githubWebhook(url);
 
 		final RepositoryHook response = service.createHook(repository, request);
 
