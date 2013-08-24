@@ -42,17 +42,9 @@ public class Github extends HttpServlet {
 
 		writer.println("Github");
 
-		/**
-		 * https://github.com/github/github-services/blob/master/lib/services/
-		 * web.rb
-		 */
-		final String githubEvent = request.getHeader("X-GitHub-Event");
-		final String githubDelivery = request.getHeader("X-GitHub-Delivery");
-
-		log.info("githubEvent : {}", githubEvent);
-		log.info("githubDelivery : {}", githubDelivery);
-
 		final String payload = Util.consume(request);
+
+		log.info("payload : {}", payload);
 
 		final Config config = ConfigFactory.parseString(payload);
 

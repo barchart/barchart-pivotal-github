@@ -31,15 +31,17 @@ public class MainHook {
 
 		System.out.println("repository: " + service.getBranches(repository));
 
+		// https://github.com/github/github-services/blob/master/lib/services/kato.rb
+
 		final Map<String, String> config = new HashMap<String, String>();
-		config.put("url",
+		config.put("webhook_url",
 				"https://barchart-pivotal-github.herokuapp.com/github");
 		config.put("content_type", "json");
 		config.put("ssl_version", "3");
 
 		final RepositoryHook request = new RepositoryHook();
 		request.setActive(true);
-		request.setName("web");
+		request.setName("lechat");
 		request.setConfig(config);
 
 		final RepositoryHook response = service.createHook(repository, request);
