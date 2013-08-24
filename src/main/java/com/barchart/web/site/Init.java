@@ -84,7 +84,7 @@ public class Init {
 	}
 
 	/**
-	 * Create github web service hookes if missing.
+	 * Create github web service hooks if missing.
 	 */
 	public static final void ensureGithubWebhookAll() throws IOException {
 
