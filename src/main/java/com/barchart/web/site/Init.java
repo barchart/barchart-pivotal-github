@@ -75,8 +75,8 @@ public class Init {
 			}
 		}
 
-		// final RepositoryHook hook = githubWebhook1(url, secret);
-		final RepositoryHook hook = githubWebhook2(url);
+		final RepositoryHook hook = githubWebhook1(url, secret);
+		// final RepositoryHook hook = githubWebhook2(url);
 
 		service.createHook(repository, hook);
 		log.info("hook create: {}", hook.getName());
