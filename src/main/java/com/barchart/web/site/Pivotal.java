@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Home page.
+ * Pivotal webhook service.
  */
 public class Pivotal extends HttpServlet {
 	private static final long serialVersionUID = 1L;

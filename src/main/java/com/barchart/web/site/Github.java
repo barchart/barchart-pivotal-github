@@ -11,8 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+
 /**
- * Home page.
+ * Github webhook service.
  */
 public class Github extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -21,6 +24,17 @@ public class Github extends HttpServlet {
 
 	@Override
 	protected void doGet(final HttpServletRequest request,
+			final HttpServletResponse response) throws ServletException,
+			IOException {
+
+		final PrintWriter writer = response.getWriter();
+
+		writer.println("Github");
+
+	}
+
+	@Override
+	protected void doPost(final HttpServletRequest request,
 			final HttpServletResponse response) throws ServletException,
 			IOException {
 
@@ -38,16 +52,11 @@ public class Github extends HttpServlet {
 		log.info("githubEvent : {}", githubEvent);
 		log.info("githubDelivery : {}", githubDelivery);
 
-	}
+		final String payload = Util.consume(request);
 
-	@Override
-	protected void doPost(final HttpServletRequest request,
-			final HttpServletResponse response) throws ServletException,
-			IOException {
+		final Config config = ConfigFactory.parseString(payload);
 
-		final PrintWriter writer = response.getWriter();
-
-		writer.println("Github");
+		// config.getInt("number");
 
 	}
 

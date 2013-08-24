@@ -1,5 +1,10 @@
 package com.barchart.web.site;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
@@ -46,6 +51,21 @@ public class Util {
 
 	public static RepositoryService githubRepositoryService() {
 		return new RepositoryService(clientGithubAPI());
+	}
+
+	public static String consume(final HttpServletRequest request)
+			throws IOException {
+
+		final StringBuilder text = new StringBuilder();
+
+		final BufferedReader reader = request.getReader();
+
+		String line;
+		while ((line = reader.readLine()) != null) {
+			text.append(line).append('\n');
+		}
+
+		return text.toString();
 	}
 
 }

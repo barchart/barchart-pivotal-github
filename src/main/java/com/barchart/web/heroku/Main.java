@@ -12,13 +12,13 @@ import com.barchart.web.site.Util;
 import com.typesafe.config.Config;
 
 /**
- * Jetty launcher.
+ * Servlet container launcher.
  */
 public class Main {
 
 	public static void main(final String[] args) throws Exception {
 
-		Init.initGithubWebhooks();
+		Init.ensureGithubWebhooks();
 
 		/** Heroku provided. */
 		final String PORT = System.getenv("PORT");
