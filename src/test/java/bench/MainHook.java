@@ -20,6 +20,7 @@ public class MainHook {
 
 		final String username = props.getProperty("GITHUB_USERNAME");
 		final String password = props.getProperty("GITHUB_PASSWORD");
+		final String secret = props.getProperty("GITHUB_SECRET");
 
 		final GitHubClient client = new GitHubClient();
 		client.setCredentials(username, password);
@@ -29,12 +30,9 @@ public class MainHook {
 		final IRepositoryIdProvider repository = service.getRepository(
 				"barchart", "barchart-http");
 
-		System.out.println("repository: " + service.getBranches(repository));
-
 		final String url = "https://barchart-pivotal-github.herokuapp.com/github";
-		final RepositoryHook request = Init.githubWebhook(url);
 
-		final RepositoryHook response = service.createHook(repository, request);
+		Init.ensureGithubWebhook(service, repository, url, secret);
 
 		final List<RepositoryHook> hookList = service.getHooks(repository);
 
@@ -45,4 +43,5 @@ public class MainHook {
 		}
 
 	}
+
 }

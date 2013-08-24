@@ -23,13 +23,14 @@ public class Init {
 	/**
 	 * Create github web service hookes if missing.
 	 */
-	public static final void ensureGithubWebhooks() throws IOException {
+	public static final void ensureGithubWebhookAll() throws IOException {
 
 		final RepositoryService service = Util.githubRepositoryService();
 
 		final Config reference = Util.reference();
 
 		final String owner = reference.getString("github.owner");
+		final String secret = reference.getString("github.secret");
 
 		final String pathRoot = reference.getString("heroku.application.url");
 		final String pathGithub = reference
@@ -47,19 +48,31 @@ public class Init {
 			final IRepositoryIdProvider repository = service.getRepository(
 					owner, name);
 
-			final List<RepositoryHook> hookList = service.getHooks(repository);
-
-			final RepositoryHook request = githubWebhook(pathWebhook);
-
-			if (contains(hookList, request)) {
-				log.info("hook present: {}", name);
-				continue;
-			} else {
-				service.createHook(repository, request);
-				log.info("hook created: {}", name);
-			}
+			ensureGithubWebhook(service, repository, pathWebhook, secret);
 
 		}
+
+	}
+
+	public static void ensureGithubWebhook(final RepositoryService service,
+			final IRepositoryIdProvider repository, final String url,
+			final String secret) throws IOException {
+
+		final List<RepositoryHook> hookList = service.getHooks(repository);
+
+		for (final RepositoryHook hook : hookList) {
+			final String name = hook.getName();
+			final boolean isMatch = HOOK_1.equals(name) || HOOK_2.equals(name);
+			if (isMatch) {
+				log.info("delete: {}", name);
+				service.deleteHook(repository, (int) hook.getId());
+			}
+		}
+
+		final RepositoryHook hook = githubWebhook1(url, secret);
+
+		service.createHook(repository, hook);
+		log.info("create: {}", hook.getName());
 
 	}
 
@@ -83,27 +96,68 @@ public class Init {
 			"pull_request_review_comment," + //
 			"status";
 
+	static String HOOK_1 = "web";
+
 	/**
 	 * Create default github webhook bean.
 	 */
-	public static RepositoryHook githubWebhook(final String url) {
+	public static RepositoryHook githubWebhook1(final String url,
+			final String secret) {
 
 		// https://github.com/github/github-services/blob/master/lib/services/web.rb
 
 		final Map<String, String> config = new HashMap<String, String>();
 		config.put("url", url); // post target
-		config.put("secret", "true"); // enable sha1
+		config.put("secret", secret); // enable sha1
 		config.put("content_type", "json"); // ensure encoding
 		config.put("ssl_version", "3"); // use secure ssl
 		config.put("insecure_ssl", "1"); // ignore ssl certificate check
-		config.put("events", KNOWN_EVENTS); // enabled github events
 
 		final RepositoryHook hook = new RepositoryHook();
 		hook.setActive(true);
-		hook.setName("web");
+		hook.setName(HOOK_1);
 		hook.setConfig(config);
 
 		return hook;
+
+	}
+
+	static String HOOK_2 = "lechat";
+
+	/**
+	 * Create default github webhook bean.
+	 */
+	public static RepositoryHook githubWebhook2(final String url) {
+
+		// https://github.com/github/github-services/blob/master/lib/services/kato.rb
+
+		final Map<String, String> config = new HashMap<String, String>();
+		config.put("webhook_url", url); // post target
+
+		final RepositoryHook hook = new RepositoryHook();
+		hook.setActive(true);
+		hook.setName(HOOK_2);
+		hook.setConfig(config);
+
+		return hook;
+
+	}
+
+	public static boolean equals(final RepositoryHook one,
+			final RepositoryHook two) {
+
+		if (!one.getName().equals(two.getName())) {
+			return false;
+		}
+
+		final Map<String, String> hookConfig = one.getConfig();
+		final Map<String, String> itemConfig = two.getConfig();
+
+		if (!hookConfig.equals(itemConfig)) {
+			return false;
+		}
+
+		return true;
 
 	}
 
@@ -114,19 +168,9 @@ public class Init {
 			final RepositoryHook item) {
 
 		for (final RepositoryHook hook : hookList) {
-
-			if (!hook.getName().equals(item.getName())) {
-				continue;
+			if (equals(hook, item)) {
+				return true;
 			}
-
-			final Map<String, String> hookConfig = hook.getConfig();
-			final Map<String, String> itemConfig = item.getConfig();
-
-			if (!hookConfig.equals(itemConfig)) {
-				continue;
-			}
-
-			return true;
 		}
 
 		return false;
