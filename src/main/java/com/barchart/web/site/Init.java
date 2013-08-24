@@ -45,6 +45,8 @@ public class Init {
 
 			final String name = project.getString("name");
 
+			log.info("project: {}", name);
+
 			final IRepositoryIdProvider repository = service.getRepository(
 					owner, name);
 
