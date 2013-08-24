@@ -70,7 +70,7 @@ public class Init {
 			final String name = hook.getName();
 			final boolean isMatch = HOOK_1.equals(name) || HOOK_2.equals(name);
 			if (isMatch) {
-				log.info("delete: {}", name);
+				log.info("hook delete: {}", name);
 				service.deleteHook(repository, (int) hook.getId());
 			}
 		}
@@ -79,7 +79,7 @@ public class Init {
 		final RepositoryHook hook = githubWebhook2(url);
 
 		service.createHook(repository, hook);
-		log.info("create: {}", hook.getName());
+		log.info("hook create: {}", hook.getName());
 
 	}
 
