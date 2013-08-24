@@ -16,11 +16,15 @@
 		<!-- Verfiy application info -->
 		<exec executable="heroku">
 			<arg value="apps:info" />
+			<arg value="--app" />
+			<arg value="barchart-pivotal-github" />
 		</exec>
 
 		<!-- Verfiy application logs -->
 		<exec executable="heroku">
 			<arg value="logs" />
+			<arg value="--app" />
+			<arg value="barchart-pivotal-github" />
 		</exec>
 
 	</target>
