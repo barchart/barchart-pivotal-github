@@ -28,6 +28,8 @@ public class Pivotal extends HttpServlet {
 
 		writer.println("Pivotal");
 
+		log.info("Pivotal");
+
 	}
 
 	@Override
@@ -38,6 +40,8 @@ public class Pivotal extends HttpServlet {
 		final PrintWriter writer = response.getWriter();
 
 		writer.println("Pivotal");
+
+		log.info("Pivotal");
 
 	}
 

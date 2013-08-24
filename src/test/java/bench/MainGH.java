@@ -7,11 +7,15 @@ import java.util.Properties;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryHook;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.barchart.web.util.UtilGH;
 import com.barchart.web.util.RepositoryServiceExtra;
+import com.barchart.web.util.UtilGH;
 
-public class MainHook {
+public class MainGH {
+
+	private static final Logger log = LoggerFactory.getLogger(MainGH.class);
 
 	public static void main(final String[] args) throws Exception {
 
@@ -38,9 +42,9 @@ public class MainHook {
 		final List<RepositoryHook> hookList = service.getHooks(repository);
 
 		for (final RepositoryHook hook : hookList) {
-			System.out.println("hook.name: " + hook.getName());
-			System.out.println("hook.url : " + hook.getUrl());
-			System.out.println("hook.conf: " + hook.getConfig());
+			log.info("hook.name: " + hook.getName());
+			log.info("hook.url : " + hook.getUrl());
+			log.info("hook.conf: " + hook.getConfig());
 		}
 
 	}
