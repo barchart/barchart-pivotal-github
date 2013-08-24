@@ -18,7 +18,70 @@ import com.typesafe.config.Config;
  */
 public class Init {
 
+	static String HOOK_1 = "web";
+
+	static String HOOK_2 = "lechat";
+
+	// https://github.com/github/github-services/blob/master/lib/service.rb#L79
+	static final String KNOWN_EVENTS = "create," + "delete," + //
+			"commit_comment," + //
+			"download," + //
+			"follow," + //
+			"fork," + //
+			"fork_apply," + //
+			"gist," + //
+			"gollum," + //
+			"issue_comment," + //
+			"issues," + //
+			"member," + //
+			"public," + //
+			"pull_request," + //
+			"push," + //
+			"team_add," + //
+			"watch," + //
+			"pull_request_review_comment," + //
+			"status";
+
 	private static final Logger log = LoggerFactory.getLogger(Init.class);
+
+	/**
+	 * Verify github webhook hook presence in the list by name and config match.
+	 */
+	public static boolean contains(final List<RepositoryHook> hookList,
+			final RepositoryHook item) {
+
+		for (final RepositoryHook hook : hookList) {
+			if (equals(hook, item)) {
+				return true;
+			}
+		}
+
+		return false;
+
+	}
+
+	public static void ensureGithubWebhook(final RepositoryService service,
+			final IRepositoryIdProvider repository, final String url,
+			final String secret) throws IOException {
+
+		final List<RepositoryHook> hookList = service.getHooks(repository);
+
+		for (final RepositoryHook hook : hookList) {
+			final String name = hook.getName();
+			final boolean isMatch = HOOK_1.equals(name) || HOOK_2.equals(name);
+			if (isMatch) {
+				log.info("delete: {}", name);
+				service.deleteHook(repository, (int) hook.getId());
+			}
+		}
+
+		// final RepositoryHook hook = githubWebhook1(url, secret);
+		final RepositoryHook hook = githubWebhook2(url);
+
+		service.createHook(repository, hook);
+		log.info("create: {}", hook.getName());
+
+	}
 
 	/**
 	 * Create github web service hookes if missing.
@@ -56,49 +119,23 @@ public class Init {
 
 	}
 
-	public static void ensureGithubWebhook(final RepositoryService service,
-			final IRepositoryIdProvider repository, final String url,
-			final String secret) throws IOException {
+	public static boolean equals(final RepositoryHook one,
+			final RepositoryHook two) {
 
-		final List<RepositoryHook> hookList = service.getHooks(repository);
-
-		for (final RepositoryHook hook : hookList) {
-			final String name = hook.getName();
-			final boolean isMatch = HOOK_1.equals(name) || HOOK_2.equals(name);
-			if (isMatch) {
-				log.info("delete: {}", name);
-				service.deleteHook(repository, (int) hook.getId());
-			}
+		if (!one.getName().equals(two.getName())) {
+			return false;
 		}
 
-		final RepositoryHook hook = githubWebhook1(url, secret);
+		final Map<String, String> hookConfig = one.getConfig();
+		final Map<String, String> itemConfig = two.getConfig();
 
-		service.createHook(repository, hook);
-		log.info("create: {}", hook.getName());
+		if (!hookConfig.equals(itemConfig)) {
+			return false;
+		}
+
+		return true;
 
 	}
-
-	// https://github.com/github/github-services/blob/master/lib/service.rb#L79
-	static final String KNOWN_EVENTS = "create," + "delete," + //
-			"commit_comment," + //
-			"download," + //
-			"follow," + //
-			"fork," + //
-			"fork_apply," + //
-			"gist," + //
-			"gollum," + //
-			"issue_comment," + //
-			"issues," + //
-			"member," + //
-			"public," + //
-			"pull_request," + //
-			"push," + //
-			"team_add," + //
-			"watch," + //
-			"pull_request_review_comment," + //
-			"status";
-
-	static String HOOK_1 = "web";
 
 	/**
 	 * Create default github webhook bean.
@@ -124,8 +161,6 @@ public class Init {
 
 	}
 
-	static String HOOK_2 = "lechat";
-
 	/**
 	 * Create default github webhook bean.
 	 */
@@ -142,40 +177,6 @@ public class Init {
 		hook.setConfig(config);
 
 		return hook;
-
-	}
-
-	public static boolean equals(final RepositoryHook one,
-			final RepositoryHook two) {
-
-		if (!one.getName().equals(two.getName())) {
-			return false;
-		}
-
-		final Map<String, String> hookConfig = one.getConfig();
-		final Map<String, String> itemConfig = two.getConfig();
-
-		if (!hookConfig.equals(itemConfig)) {
-			return false;
-		}
-
-		return true;
-
-	}
-
-	/**
-	 * Verify github webhook hook presence in the list by name and config match.
-	 */
-	public static boolean contains(final List<RepositoryHook> hookList,
-			final RepositoryHook item) {
-
-		for (final RepositoryHook hook : hookList) {
-			if (equals(hook, item)) {
-				return true;
-			}
-		}
-
-		return false;
 
 	}
 
