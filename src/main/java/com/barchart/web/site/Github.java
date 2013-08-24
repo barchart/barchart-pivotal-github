@@ -64,7 +64,7 @@ public class Github extends HttpServlet {
 
 	// "url": "https://api.github.com/repos/octocat/Hello-World/issues/1347"
 	static final Pattern RX_URL = Pattern
-			.compile(".*/repos/(\\W+)/(\\W+)/issues/.*");
+			.compile(".*/repos/([^/]+)/([^/]+)/issues/.*");
 
 	// http://developer.github.com/v3/activity/events/types/#issuesevent
 	// http://developer.github.com/v3/issues/#get-a-single-issue
