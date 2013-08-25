@@ -9,6 +9,9 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.barchart.web.util.Util;
+import com.google.common.base.Joiner;
+
 /**
  * URL utilities
  */
@@ -94,4 +97,12 @@ public abstract class UtilURL {
 		}
 		return null;
 	}
+
+	/**
+	 * Pivotal fields query paramter.
+	 */
+	public static String modelFields(final Class<?> klass) {
+		return "fields=" + Joiner.on(",").join(Util.modelFields(klass));
+	}
+
 }

@@ -10,34 +10,28 @@ import com.google.gson.reflect.TypeToken;
 /**
  * 
  */
-// https://www.pivotaltracker.com/help/api/rest/v5#project_resource
-public class Project extends Any {
+// https://www.pivotaltracker.com/help/api/rest/v5#label_resource
+public class Integration extends Any {
 
-	public static final Type LIST_TYPE = new TypeToken<List<Project>>() {
+	public static final Type LIST_TYPE = new TypeToken<List<Integration>>() {
 	}.getType();
 
 	/** immutable */
 	public Integer id;
 
-	public Integer account_id;
-
 	public String name;
 
-	public String description;
+	public Integer project_id;
 
-	public Integer current_velocity;
-
-	public String point_scale;
-
-	public String profile_content;
+	public Boolean active;
 
 	public DateTime created_at;
 	public DateTime updated_at;
 
 	@Override
 	public boolean equals(final Object other) {
-		if (other instanceof Project) {
-			return ((Project) other).id == id;
+		if (other instanceof Integration) {
+			return ((Integration) other).id == id;
 		}
 		return false;
 	}

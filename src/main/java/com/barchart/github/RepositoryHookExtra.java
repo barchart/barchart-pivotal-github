@@ -1,6 +1,8 @@
-package com.barchart.web.util;
+package com.barchart.github;
 
 import org.eclipse.egit.github.core.RepositoryHook;
+
+import com.barchart.pivotal.util.UtilGson;
 
 /**
  * Extend to reflect new Github API.
@@ -19,20 +21,12 @@ public class RepositoryHookExtra extends RepositoryHook {
 		return events;
 	}
 
+	/**
+	 * Render as JSON.
+	 */
 	@Override
 	public String toString() {
-		final StringBuilder text = new StringBuilder();
-
-		text.append("name=");
-		text.append(getName());
-
-		text.append("config=");
-		text.append(getConfig());
-
-		text.append("events=");
-		text.append(getEvents());
-
-		return text.toString();
+		return UtilGson.getGson().toJson(this);
 	}
 
 }

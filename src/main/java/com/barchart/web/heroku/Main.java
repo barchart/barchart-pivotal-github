@@ -1,14 +1,23 @@
 package com.barchart.web.heroku;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.barchart.web.site.Github;
 import com.barchart.web.site.Home;
 import com.barchart.web.site.Pivotal;
-import com.barchart.web.util.UtilGH;
 import com.barchart.web.util.Util;
+import com.barchart.web.util.UtilGH;
+import com.barchart.web.util.UtilPT;
+import com.barchart.web.util.UtilSyncIsstory;
+import com.barchart.web.util.UtilSyncMilepic;
 import com.typesafe.config.Config;
 
 /**
@@ -16,9 +25,55 @@ import com.typesafe.config.Config;
  */
 public class Main {
 
+	private static final Logger log = LoggerFactory.getLogger(Main.class);
+
+	private static final Config reference = Util.reference();
+
+	static final ScheduledExecutorService executor = Executors
+			.newScheduledThreadPool(1, new ThreadFactory("main"));
+
+	/** Periodic sync of milestone/epic */
+	static final Runnable milepicTask = new Runnable() {
+		@Override
+		public void run() {
+			try {
+				UtilSyncMilepic.linkMilestoneEpicAll();
+			} catch (final Throwable e) {
+				log.error("milestone/epic task failure", e);
+			}
+		}
+	};
+
+	/** Periodic sync of issue/story */
+	static final Runnable isstoryTask = new Runnable() {
+		@Override
+		public void run() {
+			try {
+				UtilSyncIsstory.linkIssueStoryAll();
+			} catch (final Throwable e) {
+				log.error("issue/story task failure", e);
+			}
+		}
+	};
+
 	public static void main(final String[] args) throws Exception {
 
 		UtilGH.ensureWebhookAll();
+
+		UtilPT.ensureWebhookAll();
+		UtilPT.ensureIntegrationAll();
+
+		/** Periodic sync of milestone/epic */
+		executor.scheduleAtFixedRate(milepicTask, 0,
+				reference.getMilliseconds("project-sync.milepic-period"),
+				TimeUnit.MILLISECONDS);
+
+		/** Periodic sync of issue/story */
+		executor.scheduleAtFixedRate(isstoryTask, 0,
+				reference.getMilliseconds("project-sync.isstory-period"),
+				TimeUnit.MILLISECONDS);
+
+		//
 
 		/** Heroku provided. */
 		final String PORT = System.getenv("PORT");
@@ -42,22 +97,18 @@ public class Main {
 
 		server.setHandler(context);
 
-		final Config reference = Util.reference();
-
-		final Config pathConfig = reference
-				.getConfig("heroku.application.path");
+		final Config path = reference.getConfig("heroku.app.path");
 
 		context.addServlet(new ServletHolder(new Home()),
-				pathConfig.getString("home"));
+				path.getString("home"));
 		context.addServlet(new ServletHolder(new Github()),
-				pathConfig.getString("github"));
+				path.getString("github"));
 		context.addServlet(new ServletHolder(new Pivotal()),
-				pathConfig.getString("pivotal"));
+				path.getString("pivotal"));
 
 		server.start();
 
 		server.join();
 
 	}
-
 }

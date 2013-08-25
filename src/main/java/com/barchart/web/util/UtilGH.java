@@ -8,9 +8,13 @@ import java.util.Map;
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryHook;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.IssueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.barchart.github.MilestoneServiceExtra;
+import com.barchart.github.RepositoryHookExtra;
+import com.barchart.github.RepositoryServiceExtra;
 import com.typesafe.config.Config;
 
 /**
@@ -51,21 +55,29 @@ public class UtilGH {
 
 	private static final Logger log = LoggerFactory.getLogger(UtilGH.class);
 
+	private static final ThreadLocal<GitHubClient> CLIENT_REST = new ThreadLocal<GitHubClient>() {
+		@Override
+		protected GitHubClient initialValue() {
+
+			final Config config = Util.reference();
+
+			final String username = config.getString("github.username");
+			final String password = config.getString("github.password");
+
+			final GitHubClient client = new GitHubClient();
+
+			client.setCredentials(username, password);
+
+			return client;
+
+		}
+	};
+
 	/**
 	 * New github rest-api client
 	 */
 	public static GitHubClient clientRest() {
-
-		final Config config = Util.reference();
-
-		final String username = config.getString("github.username");
-		final String password = config.getString("github.password");
-
-		final GitHubClient client = new GitHubClient();
-		client.setCredentials(username, password);
-
-		return client;
-
+		return CLIENT_REST.get();
 	}
 
 	/**
@@ -126,7 +138,7 @@ public class UtilGH {
 
 		for (final Config project : projectList) {
 
-			final String name = project.getString("name");
+			final String name = project.getString("github.name");
 
 			log.info("project: {}", name);
 
@@ -159,6 +171,14 @@ public class UtilGH {
 
 	public static RepositoryServiceExtra repositoryService() {
 		return new RepositoryServiceExtra(clientRest());
+	}
+
+	public static MilestoneServiceExtra milestoneService() {
+		return new MilestoneServiceExtra(clientRest());
+	}
+
+	public static IssueService issueService() {
+		return new IssueService(clientRest());
 	}
 
 	/**

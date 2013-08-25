@@ -542,7 +542,7 @@ public class PivotalClient {
 	 * @param uri
 	 * @throws IOException
 	 */
-	public void put(final String uri) throws IOException {
+	public void put(final StringBuilder uri) throws IOException {
 		put(uri, null, null);
 	}
 
@@ -702,7 +702,6 @@ public class PivotalClient {
 		// updateRateLimits(httpRequest);
 
 		if (isOk(code)) {
-			log.info("code : {}", code);
 			return new PivotalResponse(connection, getBody(request,
 					getStream(connection)));
 		}
@@ -742,9 +741,9 @@ public class PivotalClient {
 	 * @return response
 	 * @throws IOException
 	 */
-	public <V> V put(final String uri, final Object params, final Type type)
-			throws IOException {
-		final HttpURLConnection request = createPut(uri);
+	public <V> V put(final StringBuilder uri, final Object params,
+			final Type type) throws IOException {
+		final HttpURLConnection request = createPut(uri.toString());
 		return sendJson(request, params, type);
 	}
 

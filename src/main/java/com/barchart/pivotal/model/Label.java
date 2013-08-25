@@ -26,4 +26,12 @@ public class Label extends Any {
 	public DateTime created_at;
 	public DateTime updated_at;
 
+	@Override
+	public boolean equals(final Object other) {
+		if (other instanceof Label) {
+			return ((Label) other).id == id;
+		}
+		return false;
+	}
+
 }

@@ -1,7 +1,5 @@
 package com.barchart.pivotal.util;
 
-import static com.google.gson.FieldNamingPolicy.*;
-
 import java.io.Reader;
 import java.lang.reflect.Type;
 
@@ -42,12 +40,13 @@ public abstract class UtilGson {
 
 		// builder.registerTypeAdapter(Date.class, new DateFormatter());
 		// builder.registerTypeAdapter(Event.class, new EventFormatter());
-
-		builder.setFieldNamingPolicy(LOWER_CASE_WITH_UNDERSCORES);
+		// builder.setFieldNamingPolicy(LOWER_CASE_WITH_UNDERSCORES);
 
 		builder.registerTypeAdapter(DateTime.class, new GsonDateTime());
 
 		builder.setPrettyPrinting();
+
+		builder.disableHtmlEscaping();
 
 		if (serializeNulls) {
 			builder.serializeNulls();

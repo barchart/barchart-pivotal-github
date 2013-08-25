@@ -3,6 +3,10 @@ package com.barchart.web.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -46,6 +50,28 @@ public class Util {
 		}
 
 		return text.toString();
+	}
+
+	public static boolean isModelField(final Field field) {
+		final int modifiers = field.getModifiers();
+		return Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers);
+
+	}
+
+	public static List<String> modelFields(final Class<?> klass) {
+
+		final List<String> list = new ArrayList<String>();
+
+		final Field[] fieldArray = klass.getDeclaredFields();
+
+		for (final Field field : fieldArray) {
+			if (isModelField(field)) {
+				list.add(field.getName());
+			}
+		}
+
+		return list;
+
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.barchart.web.util;
+package com.barchart.github;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.*;
 

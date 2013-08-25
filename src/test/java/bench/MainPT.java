@@ -1,6 +1,7 @@
 package bench;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import org.joda.time.DateTime;
@@ -8,12 +9,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.barchart.pivotal.client.PivotalClient;
+import com.barchart.pivotal.model.Comment;
 import com.barchart.pivotal.model.Epic;
 import com.barchart.pivotal.model.Label;
 import com.barchart.pivotal.model.Project;
 import com.barchart.pivotal.model.Story;
 import com.barchart.pivotal.service.PivotalService;
 import com.barchart.web.util.UtilPT;
+import com.barchart.web.util.UtilSyncIsstory;
+import com.barchart.web.util.UtilSyncMilepic;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -23,9 +27,95 @@ import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
 
 public class MainPT {
 
+	/** "Common" */
+	static final int PROJECT_ID = 896678;
+
 	private static final Logger log = LoggerFactory.getLogger(MainPT.class);
 
 	public static void main(final String[] args) throws Exception {
+
+		// mainSync_M_E();
+		// mainStoryCreate();
+
+		// UtilPT.ensureWebhookAll();
+		UtilPT.ensureIntegrationAll();
+
+		UtilSyncIsstory.linkIssueStoryAll();
+
+	}
+
+	public static void mainIntegrationList(final String... args)
+			throws Exception {
+
+		final PivotalClient client = UtilPT.clientRest();
+
+		final PivotalService service = new PivotalService(client);
+
+		log.info("integraionList : {}", service.integraionList(PROJECT_ID));
+
+	}
+
+	public static void mainSync_M_E(final String... args) throws Exception {
+
+		UtilSyncMilepic.linkMilestoneEpicAll();
+
+	}
+
+	public static void mainEpic(final String[] args) throws Exception {
+
+		final PivotalClient client = UtilPT.clientRest();
+
+		final PivotalService service = new PivotalService(client);
+
+		final int projectId = PROJECT_ID;
+		final int epicId = 799144;
+		final Epic epic = service.epic(projectId, epicId);
+
+		log.info("epic : {}", epic);
+
+	}
+
+	public static void mainCommentCreateEpic(final String... args)
+			throws Exception {
+
+		final PivotalClient client = UtilPT.clientRest();
+
+		final PivotalService service = new PivotalService(client);
+
+		final Comment comment = new Comment();
+		comment.text = "test : " + new DateTime().getMillis();
+		comment.project_id = PROJECT_ID;
+		comment.epic_id = 798802;
+		// comment.commit_type = "github";
+		// comment.commit_identifier = "aaa123";
+
+		log.info("commentCreate : {}", comment);
+
+		log.info("commentCreate : {}", service.commentCreate(comment));
+
+	}
+
+	public static void mainCommentCreateStory(final String... args)
+			throws Exception {
+
+		final PivotalClient client = UtilPT.clientRest();
+
+		final PivotalService service = new PivotalService(client);
+
+		final Comment comment = new Comment();
+		comment.text = "test : " + new DateTime().getMillis();
+		comment.project_id = PROJECT_ID;
+		comment.story_id = 55650042;
+		comment.commit_type = "test";
+		comment.commit_identifier = "test123";
+
+		log.info("commentCreate : {}", comment);
+
+		log.info("commentCreate : {}", service.commentCreate(comment));
+
+	}
+
+	public static void mainLabelCreate(final String[] args) throws Exception {
 
 		final PivotalClient client = UtilPT.clientRest();
 
@@ -33,7 +123,7 @@ public class MainPT {
 
 		final Label label = new Label();
 		label.name = "test : " + new DateTime().getMillis();
-		label.project_id = 896678;
+		label.project_id = PROJECT_ID;
 
 		log.info("labelCreate : {}", label);
 
@@ -48,8 +138,51 @@ public class MainPT {
 		final PivotalService service = new PivotalService(client);
 
 		final Epic epic = new Epic();
-		epic.project_id = 896678;
+		epic.project_id = PROJECT_ID;
 		epic.name = "test : " + new DateTime();
+
+		log.info("epicCreate : {}", epic);
+
+		log.info("epicCreate : {}", service.epicCreate(epic));
+
+	}
+
+	public static void mainEpicCreateWithComment(final String... args)
+			throws Exception {
+
+		// epic1 : {
+		// "project_id": 896678,
+		// "name": "sync-1377407218454",
+		// "comments": [
+		// {
+		// "text":
+		// "https://api.github.com/repos/barchart/barchart-http/milestones/1",
+		// "commit_type": "github-milestone",
+		// "commit_identifier":
+		// "https://api.github.com/repos/barchart/barchart-http/milestones/1"
+		// }
+		// ]
+		// }
+
+		final PivotalClient client = UtilPT.clientRest();
+
+		final PivotalService service = new PivotalService(client);
+
+		final Comment comment = new Comment();
+		comment.text = "test-" + System.currentTimeMillis();
+		// comment.text =
+		// "https://api.github.com/repos/barchart/barchart-http/milestones/1";
+		// comment.commit_type = "github-milestone";
+		// comment.commit_identifier =
+		// "https://api.github.com/repos/barchart/barchart-http/milestones/1";
+		// comment.commit_type = "github";
+		// comment.commit_identifier = "abc123";
+
+		final Epic epic = new Epic();
+		epic.project_id = PROJECT_ID;
+		epic.name = "sync-1377407218454";
+		epic.comments = new ArrayList<Comment>();
+		epic.comments.add(comment);
 
 		log.info("epicCreate : {}", epic);
 
@@ -63,7 +196,7 @@ public class MainPT {
 
 		final PivotalService service = new PivotalService(client);
 
-		log.info("epicList : {}", service.epicList(896678));
+		log.info("epicList : {}", service.epicList(PROJECT_ID));
 
 	}
 
@@ -92,16 +225,19 @@ public class MainPT {
 
 	}
 
-	public static void mainStoryCreate(final String[] args) throws Exception {
+	public static void mainStoryCreate(final String... args) throws Exception {
 
 		final PivotalClient client = UtilPT.clientRest();
 
 		final PivotalService service = new PivotalService(client);
 
 		final Story story = new Story();
-		story.project_id = 896678;
+		story.project_id = PROJECT_ID;
 		story.name = "test : " + new DateTime();
+		story.description = "test : " + new DateTime();
 		story.story_type = "feature";
+		story.integration_id = 23078; // github-issues integration
+		story.external_id = "barchart/barchart-http/issues/2"; // relative path
 
 		log.info("storyCreate : {}", story);
 
@@ -115,7 +251,7 @@ public class MainPT {
 
 		final PivotalService service = new PivotalService(client);
 
-		log.info("storyList : {}", service.storyList(896678));
+		log.info("storyList : {}", service.storyList(PROJECT_ID));
 
 	}
 
