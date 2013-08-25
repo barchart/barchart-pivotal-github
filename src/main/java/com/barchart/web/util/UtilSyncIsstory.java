@@ -83,7 +83,8 @@ public class UtilSyncIsstory {
 				githubUser, githubName, params);
 
 		for (final Issue issue : issueList) {
-			log.info("issue: {}", issue);
+
+			log.info("issue: {}", issueURL(context, issue));
 
 			final List<Story> storyList = context.pivotal.storyList(pivotalId,
 					externalId(context, issue));
