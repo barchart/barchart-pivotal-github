@@ -29,30 +29,22 @@ public class Main {
 
 	private static final Config reference = Util.reference();
 
-	static final ScheduledExecutorService executor = Executors
+	private static final ScheduledExecutorService executor = Executors
 			.newScheduledThreadPool(1, new ThreadFactory("main"));
 
 	/** Periodic sync of milestone/epic */
-	static final Runnable milepicTask = new Runnable() {
+	static final Runnable milepicTask = new RunnableCore("milepicTask") {
 		@Override
-		public void run() {
-			try {
-				UtilSyncMilepic.linkMilestoneEpicAll();
-			} catch (final Throwable e) {
-				log.error("milestone/epic task failure", e);
-			}
+		protected void runCore() throws Exception {
+			UtilSyncMilepic.linkMilestoneEpicAll();
 		}
 	};
 
 	/** Periodic sync of issue/story */
-	static final Runnable isstoryTask = new Runnable() {
+	static final Runnable isstoryTask = new RunnableCore("isstoryTask") {
 		@Override
-		public void run() {
-			try {
-				UtilSyncIsstory.linkIssueStoryAll();
-			} catch (final Throwable e) {
-				log.error("issue/story task failure", e);
-			}
+		protected void runCore() throws Exception {
+			UtilSyncIsstory.linkIssueStoryAll();
 		}
 	};
 

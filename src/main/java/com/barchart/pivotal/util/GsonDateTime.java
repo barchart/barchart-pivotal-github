@@ -28,7 +28,15 @@ public class GsonDateTime implements JsonSerializer<DateTime>,
 	@Override
 	public DateTime deserialize(final JsonElement json, final Type type,
 			final JsonDeserializationContext context) throws JsonParseException {
-		return new DateTime(json.getAsString());
+		try {
+			return new DateTime(json.getAsString());
+		} catch (final Throwable e) {
+		}
+		try {
+			return new DateTime(json.getAsLong());
+		} catch (final Throwable e) {
+		}
+		throw new JsonParseException("wrong date/time");
 	}
 
 }
