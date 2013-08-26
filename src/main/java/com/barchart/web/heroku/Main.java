@@ -32,7 +32,7 @@ public class Main {
 	private static final ScheduledExecutorService executor = Executors
 			.newScheduledThreadPool(1, new ThreadFactory("main"));
 
-	/** Periodic sync of milestone/epic */
+	/** Periodic sync of milestone/epic. */
 	static final Runnable milepicTask = new RunnableCore("milepicTask") {
 		@Override
 		protected void runCore() throws Exception {
@@ -40,7 +40,7 @@ public class Main {
 		}
 	};
 
-	/** Periodic sync of issue/story */
+	/** Periodic sync of issue/story. */
 	static final Runnable isstoryTask = new RunnableCore("isstoryTask") {
 		@Override
 		protected void runCore() throws Exception {
@@ -48,20 +48,31 @@ public class Main {
 		}
 	};
 
+	/** Initial configuration, one-time. */
+	static final Runnable configurationTask = new RunnableCore(
+			"configurationTask") {
+		@Override
+		protected void runCore() throws Exception {
+
+			UtilGH.ensureWebhookAll();
+
+			UtilPT.ensureWebhookAll();
+			UtilPT.ensureIntegrationAll();
+
+		}
+	};
+
 	public static void main(final String[] args) throws Exception {
 
-		UtilGH.ensureWebhookAll();
-
-		UtilPT.ensureWebhookAll();
-		UtilPT.ensureIntegrationAll();
+		executor.submit(configurationTask);
 
 		/** Periodic sync of milestone/epic */
-		executor.scheduleAtFixedRate(milepicTask, 0,
+		executor.scheduleAtFixedRate(milepicTask, 1 * 1000,
 				reference.getMilliseconds("project-sync.milepic-period"),
 				TimeUnit.MILLISECONDS);
 
 		/** Periodic sync of issue/story */
-		executor.scheduleAtFixedRate(isstoryTask, 0,
+		executor.scheduleAtFixedRate(isstoryTask, 100 * 1000,
 				reference.getMilliseconds("project-sync.isstory-period"),
 				TimeUnit.MILLISECONDS);
 
