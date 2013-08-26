@@ -66,6 +66,10 @@ public class UtilPT {
 		@Override
 		protected WebClient initialValue() {
 			try {
+
+				log.info("client for thread: {}", Thread.currentThread()
+						.getName());
+
 				final Config reference = Util.reference();
 
 				final String username = reference.getString("pivotal.username");
@@ -111,6 +115,10 @@ public class UtilPT {
 		@Override
 		protected PivotalClient initialValue() {
 			try {
+
+				log.info("client for thread: {}", Thread.currentThread()
+						.getName());
+
 				final Config reference = Util.reference();
 
 				final String token = reference.getString("pivotal.token");

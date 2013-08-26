@@ -17,7 +17,7 @@ public class MainGH {
 
 	public static void main(final String... args) throws Exception {
 
-		mainSyncIsstory();
+		mainWebHook();
 
 	}
 
@@ -28,7 +28,11 @@ public class MainGH {
 
 	public static void mainWebHook(final String... args) throws Exception {
 
+		log.info("init");
+
 		UtilGH.ensureWebhookAll();
+
+		log.info("ready");
 
 		final RepositoryServiceExtra service = UtilGH.repositoryService();
 

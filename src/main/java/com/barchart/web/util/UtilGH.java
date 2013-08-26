@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryHook;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -30,6 +30,7 @@ public class UtilGH {
 	public static final Pattern RX_URL = Pattern
 			.compile("repos/([^/]+)/([^/]+)/issues");
 
+	// https://github.com/github/github-services/blob/master/lib/services/web.rb
 	final static String HOOK_NAME = "web";
 
 	// http://developer.github.com/v3/activity/events/types/
@@ -67,10 +68,12 @@ public class UtilGH {
 		@Override
 		protected GitHubClient initialValue() {
 
-			final Config config = Util.reference();
+			log.info("client for thread: {}", Thread.currentThread().getName());
 
-			final String username = config.getString("github.username");
-			final String password = config.getString("github.password");
+			final Config reference = Util.reference();
+
+			final String username = reference.getString("github.username");
+			final String password = reference.getString("github.password");
 
 			final GitHubClient client = new GitHubClient();
 
@@ -108,8 +111,8 @@ public class UtilGH {
 	 * Create new or replace old hook.
 	 */
 	public static void ensureWebhook(final RepositoryServiceExtra service,
-			final IRepositoryIdProvider repository, final String url,
-			final String secret) throws IOException {
+			final Repository repository, final String url, final String secret)
+			throws IOException {
 
 		final List<RepositoryHook> hookList = service.getHooks(repository);
 
@@ -121,10 +124,11 @@ public class UtilGH {
 			}
 		}
 
-		final RepositoryHook hook = webhook(url, secret);
+		final RepositoryHook hook1 = webhook(url, secret);
 
-		service.createHook(repository, hook);
-		log.info("hook create: {}", hook.getName());
+		final RepositoryHookExtra hook2 = service.createHook(repository, hook1);
+
+		log.info("hook create: {}", hook2.getName());
 
 	}
 
@@ -150,8 +154,7 @@ public class UtilGH {
 
 			log.info("project: {}", name);
 
-			final IRepositoryIdProvider repository = service.getRepository(
-					owner, name);
+			final Repository repository = service.getRepository(owner, name);
 
 			ensureWebhook(service, repository, webhook, secret);
 
@@ -192,10 +195,9 @@ public class UtilGH {
 	/**
 	 * Create default github webhook bean.
 	 */
+	// https://github.com/github/github-services/blob/master/lib/services/web.rb
 	public static RepositoryHookExtra webhook(final String url,
 			final String secret) {
-
-		// https://github.com/github/github-services/blob/master/lib/services/web.rb
 
 		final Map<String, String> config = new HashMap<String, String>();
 		config.put("url", url); // target for http post
