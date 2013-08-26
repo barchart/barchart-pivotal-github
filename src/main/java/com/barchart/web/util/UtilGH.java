@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.RepositoryHook;
@@ -22,7 +23,14 @@ import com.typesafe.config.Config;
  */
 public class UtilGH {
 
-	static String HOOK_NAME = "web";
+	/**
+	 * Pattern to extract user and project.
+	 */
+	// "url": "https://api.github.com/repos/octocat/Hello-World/issues/1347"
+	public static final Pattern RX_URL = Pattern
+			.compile("repos/([^/]+)/([^/]+)/issues");
+
+	final static String HOOK_NAME = "web";
 
 	// http://developer.github.com/v3/activity/events/types/
 	// https://github.com/github/github-services/blob/master/lib/service.rb#L79

@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.barchart.web.util.UtilGH;
+
 public class TestGithub {
 
 	private static final Logger log = LoggerFactory.getLogger(TestGithub.class);
@@ -17,7 +19,7 @@ public class TestGithub {
 
 		final String url = "https://api.github.com/repos/octocat/Hello-World/issues/1347";
 
-		final Matcher matcher = Github.RX_URL.matcher(url);
+		final Matcher matcher = UtilGH.RX_URL.matcher(url);
 
 		matcher.find();
 

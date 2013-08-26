@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.barchart.web.heroku.RunnableCore;
 import com.barchart.web.heroku.ThreadFactory;
 import com.barchart.web.util.Util;
+import com.barchart.web.util.UtilGH;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -74,13 +74,6 @@ public class Github extends HttpServlet {
 
 	}
 
-	/**
-	 * Pattern to extract user and project.
-	 */
-	// "url": "https://api.github.com/repos/octocat/Hello-World/issues/1347"
-	static final Pattern RX_URL = Pattern
-			.compile("repos/([^/]+)/([^/]+)/issues");
-
 	// http://developer.github.com/v3/activity/events/types/#issuesevent
 	// http://developer.github.com/v3/issues/#get-a-single-issue
 	protected void processIssues(final Config payload) {
@@ -96,7 +89,7 @@ public class Github extends HttpServlet {
 				final String title = issue.getString("title");
 				final String number = issue.getString("number");
 
-				final Matcher matcher = RX_URL.matcher(url);
+				final Matcher matcher = UtilGH.RX_URL.matcher(url);
 				matcher.find();
 				final String user = matcher.group(1);
 				final String project = matcher.group(2);
