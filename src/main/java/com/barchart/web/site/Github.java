@@ -58,6 +58,12 @@ public class Github extends HttpServlet {
 		}
 
 		final String githubEvent = request.getHeader("X-GitHub-Event");
+
+		if (githubEvent == null) {
+			log.error("missing github event");
+			return;
+		}
+
 		log.info("githubEvent : {}", githubEvent);
 
 		final String paytext = Util.consume(request);

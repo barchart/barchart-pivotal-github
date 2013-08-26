@@ -117,9 +117,8 @@ public class UtilGH {
 		final List<RepositoryHook> hookList = service.getHooks(repository);
 
 		for (final RepositoryHook hook : hookList) {
-			final String name = hook.getName();
-			if (HOOK_NAME.equals(name)) {
-				log.info("hook delete: {}", name);
+			if (HOOK_NAME.equals(hook.getName())) {
+				log.info("hook delete: {} {}", hook.getName(), hook.getUrl());
 				service.deleteHook(repository, (int) hook.getId());
 			}
 		}
@@ -128,7 +127,7 @@ public class UtilGH {
 
 		final RepositoryHookExtra hook2 = service.createHook(repository, hook1);
 
-		log.info("hook create: {}", hook2.getName());
+		log.info("hook create: {} {}", hook2.getName(), hook2.getUrl());
 
 	}
 
@@ -201,7 +200,7 @@ public class UtilGH {
 
 		final Map<String, String> config = new HashMap<String, String>();
 		config.put("url", url); // target for http post
-		config.put("secret", secret); // enable hmac verification
+		// config.put("secret", secret); // enable hmac verification
 		config.put("content_type", "json"); // ensure body encoding
 		config.put("ssl_version", "3"); // use latest ssl protocol
 		config.put("insecure_ssl", "1"); // ignore ssl certificate mismatch

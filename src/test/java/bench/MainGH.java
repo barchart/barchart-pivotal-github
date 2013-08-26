@@ -2,11 +2,11 @@ package bench;
 
 import java.util.List;
 
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.RepositoryHook;
+import org.eclipse.egit.github.core.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.barchart.github.RepositoryHookExtra;
 import com.barchart.github.RepositoryServiceExtra;
 import com.barchart.web.util.UtilGH;
 import com.barchart.web.util.UtilSyncIsstory;
@@ -36,15 +36,14 @@ public class MainGH {
 
 		final RepositoryServiceExtra service = UtilGH.repositoryService();
 
-		final IRepositoryIdProvider repository = service.getRepository(
-				"barchart", "barchart-http");
+		final Repository repository = service.getRepository("barchart",
+				"barchart-http");
 
-		final List<RepositoryHook> hookList = service.getHooks(repository);
+		final List<RepositoryHookExtra> hookList = service
+				.getHooksExtra(repository);
 
-		for (final RepositoryHook hook : hookList) {
-			log.info("hook.name: " + hook.getName());
-			log.info("hook.url : " + hook.getUrl());
-			log.info("hook.conf: " + hook.getConfig());
+		for (final RepositoryHookExtra hook : hookList) {
+			log.info("hook \n{}", hook);
 		}
 
 	}
